@@ -68,7 +68,7 @@
                 try {
                     const guid = document.getElementById('testGuid').value;
 
-                    const response = await fetch(`/admin/test/${guid}`, {
+                    const response = await fetch(`/admin/test/delete?guid=${guid}`, {
                         method: 'DELETE'
                     });
 
