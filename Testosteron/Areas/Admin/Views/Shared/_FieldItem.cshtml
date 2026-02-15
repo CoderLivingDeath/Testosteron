@@ -1,0 +1,71 @@
+@using Testosteron.Areas.Admin.Models
+@model AdminTestFieldViewModel
+@{
+    var prefix = ViewData.TemplateInfo?.HtmlFieldPrefix ?? "";
+    var fieldIndex = prefix.Replace("Fields[", "").Replace("]", "");
+}
+
+<div class="card mb-3 field-item">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">
+            <input asp-for="Title" class="form-control field-title" 
+                   data-val="true" data-val-required="Название обязательно" />
+            <span class="text-danger field-validation-valid" data-valmsg-for="Title"></span>
+        </h5>
+        <div>
+            <button type="button" class="btn btn-outline-secondary move-up" title="Вверх">↑</button>
+            <button type="button" class="btn btn-outline-secondary move-down" title="Вниз">↓</button>
+        </div>
+        <div>
+            <button type="button" class="btn btn-sm btn-outline-danger delete-field">Удалить</button>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="mb-3">
+            <div>
+                <h6>Параметры</h6>
+                <div class="d-flex align-items-center gap-2">
+                    <label class="form-label mb-0">Тип</label>
+                    <select asp-for="TestFieldType" class="form-select form-select-sm field-type" style="width: auto;">
+                        @foreach (var type in Model.AvailableTypes)
+                        {
+                            <option value="@type">@type</option>
+                        }
+                    </select>
+
+                    <label class="form-check-label mb-0 ms-2">Обязателен</label>
+                    <input asp-for="Required" type="checkbox" class="form-check-input" />
+                </div>
+            </div>
+        </div>
+        <div class="mb-3">
+            <h6>Описание</h6>
+            <div>
+                <textarea asp-for="Description" class="form-control field-description" rows="3"
+                          style="width: 100%; resize: vertical;"></textarea>
+            </div>
+        </div>
+        <div class="options-section">
+            <h6>Опции:</h6>
+            <div class="options-container">
+                @if (Model.Options != null && Model.Options.Length > 0)
+                {
+                    for (int j = 0; j < Model.Options.Length; j++)
+                    {
+                        <div class="option-row row mb-2 align-items-center">
+                            <div class="col-md-10">
+                                <input name="Fields[@fieldIndex].Options[@j]" value="@Model.Options[j]" class="form-control option-input" />
+                            </div>
+                            <div class="col-md-2">
+                                <button type="button" class="btn btn-sm btn-outline-danger remove-option">×</button>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-primary mt-2 add-option">
+                + Добавить опцию
+            </button>
+        </div>
+    </div>
+</div>

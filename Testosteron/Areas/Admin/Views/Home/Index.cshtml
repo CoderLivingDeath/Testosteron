@@ -1,0 +1,96 @@
+﻿<div class="container px-4 py-4">
+    <div class="row justify-content-center">
+        <div class="col-xl-6 col-lg-8">
+            <h1 class="h4 fw-bold mb-3 pb-2 border-bottom border-2">Администрирование</h1>
+
+            <div class="border p-3 mb-3">
+                <h2 class="h6 fw-bold mb-2 pb-1 border-bottom border-1 text-muted small">Управление тестами</h2>
+                <div class="d-grid gap-2">
+                    <button id="createTestBtn" onclick="createTest()" class="btn btn-primary rounded-0 px-3 py-2 fw-semibold">Добавить тест</button>
+                    <div class="input-group input-group-sm">
+                        <input id="testGuid" type="text" name="testGuid" class="form-control rounded-0 border-end-0 px-3 py-2" placeholder="GUID теста">
+                        <button id="editButton" onclick="editTest()" class="btn btn-outline-primary rounded-0 px-3 py-2">Редактировать</button>
+                        <button onclick="return deleteTest()" class="btn btn-danger rounded-0 px-3 py-2">Удалить</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border p-3">
+                <h2 class="h6 fw-bold mb-2 pb-1 border-bottom border-1 text-muted small">Статические страницы</h2>
+                <div class="d-grid gap-2">
+                    <a href="/admin/pages/main" class="btn btn-outline-secondary rounded-0 px-3 py-2 w-100 small fw-semibold">Главная</a>
+                    <a href="/admin/pages/about" class="btn btn-outline-secondary rounded-0 px-3 py-2 w-100 small fw-semibold">О нас</a>
+                    <a href="/admin/pages/contacts" class="btn btn-outline-secondary rounded-0 px-3 py-2 w-100 small fw-semibold">Контакты</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script>
+        async function createTest() {
+            try {
+                const response = await fetch('/admin/test/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value
+                    }
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    window.location.href = `/admin/test/edit?guid=${result.value.id}`;
+                } else {
+                    alert('Ошибка при создании теста: ' + result.message);
+                    console.error(result)
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Произошла ошибка при создании теста');
+            }
+        }
+
+        function editTest() {
+            const guid = document.getElementById('testGuid').value;
+            if (guid) {
+                window.location.href = `/admin/test/edit?guid=${guid}`;
+            } else {
+                alert('Введите GUID теста');
+            }
+        }
+
+        async function deleteTest() {
+            if (confirm('Удалить?')) {
+                try {
+                    const guid = document.getElementById('testGuid').value;
+
+                    const response = await fetch(`/admin/test/${guid}`, {
+                        method: 'DELETE'
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`Ошибка: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+
+                    if (result.succsess) {
+                        document.getElementById('testGuid').value = '';
+                        alert(result.message);
+                    } else {
+                        alert(result.message);
+                    }
+                } catch (error) {
+                    console.error('Ошибка удаления:', error);
+                    alert('Ошибка при удалении теста');
+                }
+            }
+            return false;
+        }
+    </script>
+}
+

@@ -1,0 +1,20 @@
+## Ignore build artifacts
+bin/
+obj/
+Debug/
+Release/
+*.user
+*.suo
+
+## Ignore IDE files
+.vs/
+.idea/
+*.sln.DotSettings
+
+## Ignore dotnet temporary files
+*.log
+.pdb
+
+## Ignore OS files
+Thumbs.db
+.DS_Store

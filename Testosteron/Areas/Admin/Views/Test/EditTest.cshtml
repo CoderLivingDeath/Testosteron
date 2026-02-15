@@ -1,0 +1,73 @@
+@using Testosteron.Areas.Admin.Models
+@model EditTestViewModel
+@{
+    ViewBag.Title = Model.TestTitle + " - Админ панель";
+    ViewBag.Description = "Редактирование теста";
+}
+
+<div class="container mt-5">
+    <div id="resultDiv">
+    </div>
+
+    <form id="TestForm" asp-action="Edit" asp-route-guid="@Model.Guid">
+
+        <small class="text-muted">GUID: @Model.Guid</small>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="h3 mb-2"
+                    contenteditable="true"
+                    style="border-bottom: 2px dotted #ccc; padding-bottom: 5px; min-height: 38px;">
+                    @Model.TestTitle
+                </h1>
+
+                <div contenteditable="true"
+                     class="form-control mb-2 p-3 border-dashed"
+                     style="min-height: 80px; border-style: dashed; border-color: #ccc; border-width: 2px;">
+                    @Model.Description
+                </div>
+
+                <input type="hidden" asp-for="Guid"/>
+                <input type="hidden" asp-for="TestTitle" id="testTitleInput" />
+                <input type="hidden" asp-for="Description" id="testDescriptionInput" />
+            </div>
+            <a href="/Admin/Tests" class="btn btn-secondary">← Назад к списку</a>
+        </div>
+
+        <div id="fieldsContainer">
+            @for (int i = 0; i < Model.Fields.Count; i++)
+            {
+                <partial name="_FieldItem" for="@Model.Fields[i]" />
+            }
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="d-flex gap-2">
+                    <button type="button" id="addField" class="btn btn-success">+ Добавить поле</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary btn-lg">Сохранить тест</button>
+            <a asp-action="Preview" asp-controller="Test" asp-area="Admin" asp-route-guid="@Model.Guid" class="btn btn-outline-info btn-lg">👁 Предпросмотр</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts
+{
+    <script src="~/js/test-edit-manager.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const manager = new TestEditManager({
+                fieldsContainerId: 'fieldsContainer',
+                addFieldBtnId: 'addField',
+                formId: 'TestForm',
+                resultDivId: 'resultDiv',
+                templateUrl: '/Admin/Test/GetFieldTemplate',
+                initialFieldCount: @Model.Fields.Count
+            }).init();
+        });
+    </script>
+}
