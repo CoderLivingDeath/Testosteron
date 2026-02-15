@@ -2,7 +2,6 @@
 @model AdminTestFieldViewModel
 @{
     var prefix = ViewData.TemplateInfo?.HtmlFieldPrefix ?? "";
-    var fieldIndex = prefix.Replace("Fields[", "").Replace("]", "");
 }
 
 <div class="card mb-3 field-item">
@@ -54,7 +53,7 @@
                     {
                         <div class="option-row row mb-2 align-items-center">
                             <div class="col-md-10">
-                                <input name="Fields[@fieldIndex].Options[@j]" value="@Model.Options[j]" class="form-control option-input" />
+                                <input asp-for="Options[@j]" class="form-control option-input" />
                             </div>
                             <div class="col-md-2">
                                 <button type="button" class="btn btn-sm btn-outline-danger remove-option">×</button>

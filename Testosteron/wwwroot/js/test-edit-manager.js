@@ -13,7 +13,6 @@ class TestEditManager {
         this.onError = options.onError || this._defaultOnError.bind(this);
 
         this.fieldCount = this.initialFieldCount;
-        this.tempMarker = '__NEW__';
     }
 
     init() {
@@ -24,7 +23,6 @@ class TestEditManager {
 
         this._bindEvents();
         this._initEditableSync();
-        this._initFieldTypeListeners();
 
         return this;
     }
@@ -37,14 +35,12 @@ class TestEditManager {
 
     async addField() {
         try {
-            const response = await fetch(`${this.templateUrl}?index=${this.tempMarker}`);
+            const tempIndex = '__NEW__' + Date.now();
+            const response = await fetch(this.templateUrl + '?index=' + encodeURIComponent(tempIndex));
             if (!response.ok) throw new Error('Failed to load template');
 
             const html = await response.text();
-
             this.fieldsContainer.insertAdjacentHTML('beforeend', html);
-
-            this._initFieldTypeListeners();
 
             const newField = this.fieldsContainer.lastElementChild;
             this._triggerEvent('fieldAdded', { field: newField });
@@ -92,8 +88,8 @@ class TestEditManager {
         if (!container) return null;
 
         const optionCount = container.querySelectorAll('.option-row').length;
-
-        const html = this._createOptionHtml(optionCount);
+        const fieldIndex = this._getFieldIndex(fieldElement);
+        const html = this._createOptionHtml(fieldIndex, optionCount);
         container.insertAdjacentHTML('beforeend', html);
 
         return container.lastElementChild;
@@ -114,7 +110,7 @@ class TestEditManager {
         let newIndex = 0;
 
         fields.forEach(field => {
-            field.querySelectorAll('[name*="Fields["]').forEach(input => {
+            field.querySelectorAll('[name]').forEach(input => {
                 input.name = this._updateFieldIndex(input.name, newIndex);
             });
             this.reindexOptions(field.querySelector('.options-container'));
@@ -175,8 +171,6 @@ class TestEditManager {
             this.addOption(fieldItem);
         } else if (event.target.classList.contains('remove-option')) {
             this.removeOption(event.target.closest('.option-row'));
-        } else if (event.target.classList.contains('field-type')) {
-            this._toggleOptionsSection(fieldItem, event.target.value);
         }
     }
 
@@ -202,39 +196,15 @@ class TestEditManager {
         this._initEditableSync();
     }
 
-    _initFieldTypeListeners() {
-        this.fieldsContainer.querySelectorAll('.field-type').forEach(select => {
-            select.addEventListener('change', (e) => {
-                const field = e.target.closest('.field-item');
-                this._toggleOptionsSection(field, e.target.value);
-            });
-        });
-
-        this.fieldsContainer.querySelectorAll('.field-item').forEach(field => {
-            const select = field.querySelector('.field-type');
-            const section = field.querySelector('.options-section');
-            if (select && section) {
-                section.classList.toggle('d-none', select.value === 'text');
-            }
-        });
-    }
-
-    _toggleOptionsSection(fieldElement, type) {
-        const section = fieldElement?.querySelector('.options-section');
-        if (section) {
-            section.classList.toggle('d-none', type === 'text');
-        }
-    }
-
     _getFieldIndex(fieldElement) {
         return Array.from(this.fieldsContainer.children).indexOf(fieldElement);
     }
 
-    _createOptionHtml(optionIndex) {
+    _createOptionHtml(fieldIndex, optionIndex) {
         return `
             <div class="option-row row mb-2 align-items-center">
                 <div class="col-md-10">
-                    <input name="Fields[${this.tempMarker}].Options[${optionIndex}]" 
+                    <input name="Fields[${fieldIndex}].Options[${optionIndex}]" 
                            class="form-control option-input" placeholder="Вариант ${optionIndex + 1}" />
                 </div>
                 <div class="col-md-2">
@@ -245,24 +215,14 @@ class TestEditManager {
     }
 
     _updateFieldIndex(name, newIndex) {
-        if (name.includes(this.tempMarker)) {
-            return name.replace(
-                new RegExp(`Fields\\[${this.tempMarker}\\]\\.`),
-                `Fields[${newIndex}].`
-            );
-        }
-        return name.replace(/Fields\[\d+\]\./, `Fields[${newIndex}].`);
+        // Fields[__NEW__123] -> Fields[newIndex]
+        // Fields[0] -> Fields[newIndex]
+        return name.replace(/Fields\[[^\]]+\]/, `Fields[${newIndex}]`);
     }
 
     _updateOptionIndex(name, fieldIndex, optIndex) {
-        if (name.includes(this.tempMarker)) {
-            return name.replace(
-                new RegExp(`Fields\\[${this.tempMarker}\\]\\.Options\\[\\d+\\]`),
-                `Fields[${fieldIndex}].Options[${optIndex}]`
-            );
-        }
         return name.replace(
-            new RegExp(`Fields\\[${fieldIndex}\\]\\.Options\\[\\d+\\]`),
+            /Fields\[[^\]]+\]\.Options\[\d+\]/,
             `Fields[${fieldIndex}].Options[${optIndex}]`
         );
     }
@@ -280,7 +240,8 @@ class TestEditManager {
     _defaultOnError(error) {
         console.error('TestEditManager Error:', error);
         if (this.resultDiv) {
-            this.resultDiv.innerHTML = `<div class="alert alert-danger">${error.message || 'Ошибка сохранения'}</div>`;
+            this.resultDiv.innerHTML = '<div class="alert alert-danger">' + 
+                (error.message || 'Ошибка сохранения') + '</div>';
         }
     }
 }

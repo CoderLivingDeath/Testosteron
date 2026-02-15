@@ -5,9 +5,9 @@ namespace Testosteron.Areas.Admin.Components
 {
     public class TestFieldViewComponent : ViewComponent
     {
-        public IViewComponentResult Invoke(string index)
+        public IViewComponentResult Invoke(string index, AdminTestFieldViewModel? model = null)
         {
-            var vm = new AdminTestFieldViewModel
+            var fieldModel = model ?? new AdminTestFieldViewModel
             {
                 Title = "Новое поле",
                 Description = "",
@@ -18,7 +18,7 @@ namespace Testosteron.Areas.Admin.Components
 
             ViewData.TemplateInfo.HtmlFieldPrefix = $"Fields[{index}]";
 
-            return View("~/Areas/Admin/Views/Shared/_FieldItem.cshtml", vm);
+            return View("~/Areas/Admin/Views/Shared/_FieldItem.cshtml", fieldModel);
         }
     }
 }
