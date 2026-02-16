@@ -1,0 +1,59 @@
+@using Testosteron.Views.Components
+@model TestFieldComponentViewModel
+
+<div class="card mb-3">
+    <div class="card-body">
+        <input type="hidden" asp-for="Field.TestFieldType" />
+        
+        <h3 class="card-title mb-3">@Model.Field.Title</h3>
+        
+        @if (!string.IsNullOrEmpty(Model.Field.Description))
+        {
+            <p class="text-muted mb-3">@Model.Field.Description</p>
+        }
+        
+        @switch (Model.Field.TestFieldType)
+        {
+            case "check":
+                @for (int j = 0; j < Model.Field.Options.Length; j++)
+                {
+                    <div class="form-check mb-2">
+                        <input type="checkbox" 
+                               asp-for="@Model.CheckboxValues[j]"
+                               class="form-check-input" />
+                        <label class="form-check-label">
+                            @Model.Field.Options[j]
+                        </label>
+                    </div>
+                }
+                break;
+                
+            case "radio":
+                @for (int j = 0; j < Model.Field.Options.Length; j++)
+                {
+                    <div class="form-check mb-2">
+                        <input type="radio" 
+                               asp-for="@Model.RadioIndex"
+                               value="@j" 
+                               class="form-check-input" />
+                        <label class="form-check-label">
+                            @Model.Field.Options[j]
+                        </label>
+                    </div>
+                }
+                break;
+                
+            default:
+                @for (int j = 0; j < Model.Field.Options.Length; j++)
+                {
+                    <div class="mb-3">
+                        <label class="form-label">@Model.Field.Options[j]</label>
+                        <textarea asp-for="@Model.TextValues[j]"
+                                  class="form-control" 
+                                  rows="3"></textarea>
+                    </div>
+                }
+                break;
+        }
+    </div>
+</div>

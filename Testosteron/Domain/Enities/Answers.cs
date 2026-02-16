@@ -16,7 +16,7 @@ public class Answers
     [Required]
     [Column("ContentJson", TypeName = "jsonb")]
     [MaxLength(4000)]
-    public List<FieldAnswer> Content { get; set; } = new();
+    public AnswersContainer Content { get; set; } = new();
 
     [ForeignKey("TestId")]
     public Test Test { get; set; } = null!;
@@ -25,3 +25,17 @@ public class Answers
     public ApplicationUser? User { get; set; } = null!;
 }
 
+public class AnswersContainer
+{
+    public List<FieldAnswer> Content { get; set; } = new();
+
+    public AnswersContainer()
+    {
+        
+    }
+
+    public AnswersContainer(List<FieldAnswer> content)
+    {
+        Content = content;
+    }
+}

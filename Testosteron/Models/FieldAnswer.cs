@@ -1,21 +1,24 @@
-﻿public class FieldAnswer
+﻿using System.Text.Json.Serialization;
+
+public class FieldAnswer
 {
-    public Guid FieldId { get; set; }
     public string FieldType { get; set; } = "text";
-    public string[] Options { get; set; } = Array.Empty<string>();
 
     // Для чекбоксов: список bool для каждой опции
-    public List<bool>? CheckboxValues { get; set; }
+    public bool[]? CheckboxValues { get; set; }
 
     // Для радиокнопок: индекс выбранной опции
     public int? RadioIndex { get; set; }
 
     // Для текстовых полей: текст ответа
-    public string? TextValue { get; set; }
+    public string[]? TextValue { get; set; }
 
     // Вспомогательные методы
+    [JsonIgnore]
     public bool IsCheckbox => FieldType == "check";
+    [JsonIgnore]
     public bool IsRadio => FieldType == "radio";
+    [JsonIgnore]
     public bool IsText => FieldType == "text" || string.IsNullOrEmpty(FieldType);
 
     // Конвертация CheckboxValues в SelectedIndices
@@ -24,7 +27,7 @@
         if (CheckboxValues == null) return new List<int>();
 
         var indices = new List<int>();
-        for (int i = 0; i < CheckboxValues.Count; i++)
+        for (int i = 0; i < CheckboxValues.Length; i++)
         {
             if (CheckboxValues[i]) indices.Add(i);
         }
@@ -37,7 +40,7 @@
         if (CheckboxValues == null) return;
 
         // Сначала все false
-        for (int i = 0; i < CheckboxValues.Count; i++)
+        for (int i = 0; i < CheckboxValues.Length; i++)
         {
             CheckboxValues[i] = false;
         }
@@ -45,7 +48,7 @@
         // Потом отмечаем выбранные
         foreach (var index in indices)
         {
-            if (index < CheckboxValues.Count)
+            if (index < CheckboxValues.Length)
             {
                 CheckboxValues[index] = true;
             }

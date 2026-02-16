@@ -1,9 +1,13 @@
-﻿@model TestViewModel
+@model TestViewModel
 @{
     ViewBag.Title = Model.TestTitle;
 }
 
-<form class="test container mt-4" method="post" asp-route-guid="@Model.TestId" asp-action="Test" target="_self">
+<form id="form" action="/Test" method="post" class="test container mt-4">
+    @Html.AntiForgeryToken()
+
+    <input type="hidden" asp-for="TestId" />
+
     <h1 class="mb-4">@Model.TestTitle</h1>
 
     @if (!string.IsNullOrEmpty(Model.TestDescription))
@@ -15,85 +19,60 @@
 
     @for (int i = 0; i < Model.TestFields.Count(); i++)
     {
-        var field = Model.TestFields.ElementAt(i);
-        var answer = Model.Answers.ElementAtOrDefault(i);
-
-        <div class="card mb-3">
-            <div class="card-body">
-                <h3 class="card-title mb-3">@field.Title</h3>
-
-                <!-- Скрытые поля для идентификации -->
-                <input type="hidden" asp-for="Answers[i].FieldType" value="@field.TestFieldType?.ToLower()" />
-
-                @switch (field.TestFieldType?.ToLower())
-                {
-                    case "check":
-                        @if (answer?.CheckboxValues != null)
-                        {
-                            @for (int j = 0; j < field.Options.Length; j++)
-                            {
-                                <div class="form-check mb-2">
-                                    <input asp-for="Answers[i].CheckboxValues[j]"
-                                           class="form-check-input"
-                                           type="checkbox" />
-                                    <label class="form-check-label" asp-for="Answers[i].CheckboxValues[j]">
-                                        @field.Options[j]
-                                    </label>
-                                </div>
-                            }
-                        }
-                        else
-                        {
-                            @for (int j = 0; j < field.Options.Length; j++)
-                            {
-                                <div class="form-check mb-2">
-                                    <input class="form-check-input"
-                                           type="checkbox"
-                                           name="Answers[@i].CheckboxValues[@j]"
-                                           value="true" />
-                                    <input type="hidden"
-                                           name="Answers[@i].CheckboxValues[@j]"
-                                           value="false" />
-                                    <label class="form-check-label">
-                                        @field.Options[j]
-                                    </label>
-                                </div>
-                            }
-                        }
-                        break;
-
-                    case "radio":
-                        @for (int j = 0; j < field.Options.Length; j++)
-                        {
-                            <div class="form-check mb-2">
-                                <input asp-for="Answers[i].RadioIndex"
-                                       class="form-check-input"
-                                       type="radio"
-                                       value="@j" />
-                                <label class="form-check-label" asp-for="Answers[i].RadioIndex">
-                                    @field.Options[j]
-                                </label>
-                            </div>
-                        }
-                        break;
-
-                    default: // text или другие типы
-                        @for (int j = 0; j < field.Options.Length; j++)
-                        {
-                            <div class="mb-3">
-                                <label class="form-label" asp-for="Answers[i].TextValue">@field.Options[j]</label>
-                                <textarea asp-for="Answers[i].TextValue"
-                                          class="form-control"
-                                          rows="3"></textarea>
-                            </div>
-                        }
-                        break;
-                }
-            </div>
-        </div>
+        @await Component.InvokeAsync("PublicTestField", new { prefix = $"{nameof(Model.TestFields)}[{i}]", field = Model.TestFields.ElementAt(i) })
     }
 
     <div class="mt-4">
+        <div id="alertPlaceholder"></div>
         <button type="submit" class="btn btn-primary btn-lg">Отправить</button>
     </div>
 </form>
+
+@section Scripts
+{
+    <script>
+        function showAlert(type, message) {
+            const alertHtml =
+                `<div class="alert alert-${type} alert-dismissible fade show mt-3" role="alert">
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>`;
+            document.getElementById('alertPlaceholder').innerHTML = alertHtml;
+        }
+        $("#form").submit(function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            fetch("test", {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        throw new Error(text || "HTTP " + response.status + ": " + response.statusText);
+                    });
+                }
+                return response.text().then(text => {
+                    try {
+                        return JSON.parse(text);
+                    } catch {
+                        return text;
+                    }
+                });
+            })
+            .then(result => {
+                if(result.success)
+                {
+                    showAlert('success', result.message);
+                }
+                else
+                {
+                    showAlert('danger', result.message);
+                }
+            })
+            .catch(error => {
+                showAlert('danger', error.message);
+            });
+        });
+    </script>
+}

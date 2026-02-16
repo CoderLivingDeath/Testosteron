@@ -44,16 +44,6 @@ namespace Testosteron.Controllers
             return View(paginated);
         }
 
-        //[ ] Запись ответов в базу данных 
-        // - разрешить не авторизованных пользователей
-        [HttpPost("{guid}")]
-        public IActionResult Test(Guid guid, TestViewModel model)
-        {
-            var answers = model.Answers;
-
-            return Ok(answers);
-        }
-
     }
 
     public class PaginatedList<T> : List<T>

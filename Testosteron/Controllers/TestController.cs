@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Testosteron.Domain;
 using Testosteron.Domain.Enities;
@@ -37,8 +37,8 @@ namespace Testosteron.Controllers
             return View(model);
         }
 
-        [HttpPost("{guid}")]
-        public async Task<IActionResult> Test(Guid guid, [FromForm] TestViewModel viewModel)
+        [HttpPost]
+        public async Task<IActionResult> Test([FromForm] TestViewModel viewModel)
         {
             var currentUser = await _userManager.GetUserAsync(User);
 
@@ -50,14 +50,14 @@ namespace Testosteron.Controllers
 
                 if (answers.Success)
                 {
-                    return Content("вы уже дали ответ на этот тест");
+                    return Json(new { success = false, message = "Вы уже дали ответ на этот тест" });
                 }
             }
 
 
-            var result = await _testManager.AddAnswersToTest(new() { TestId = viewModel.TestId, UserId = userId });
+            var result = await _testManager.AddAnswersToTest(new() { TestId = viewModel.TestId, UserId = userId, Content = viewModel.TestFields.Select(item => item.GetAnswer()).ToList() });
 
-            return Json(result);
+            return Json(new { success = true, message = "Ответ сохранен" });
         }
     }
 }

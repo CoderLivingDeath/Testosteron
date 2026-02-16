@@ -62,7 +62,7 @@ namespace Testosteron.Services
                     Id = Guid.NewGuid(),
                     TestId = dto.TestId,
                     UserId = dto.UserId,
-                    Content = dto.Content
+                    Content = new(dto.Content)
                 };
 
                 await _answersRepository.AddAsync(answers);
@@ -185,9 +185,10 @@ namespace Testosteron.Services
         {
             return new Answers()
             {
-                Id = Guid.Empty,
+                Id = Guid.NewGuid(),
+                TestId = dto.TestId,
                 UserId = dto.UserId,
-                Content = dto.Content
+                Content = new(dto.Content)
             };
         }
     }
