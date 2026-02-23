@@ -1,17 +1,25 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using Testosteron.Models.Validation;
 
 namespace Testosteron.Models
 {
     public class LoginModel
     {
-        [Required, DisplayName("Логин")]
-        public string UserName { get; set; }
+        [Required(ErrorMessage = "Логин обязателен")]
+        [EmailAddress(ErrorMessage = "Логин должен быть в формате email (например: user@domain.com)")]
+        [MinLength(6, ErrorMessage = "Логин должен содержать минимум 6 символов")]
+        [RegularExpression(@"^[a-zA-Z0-9@.]+$", ErrorMessage = "Только латинские буквы, цифры и символы @ .")]
+        [DisplayName("Логин")]
+        public string UserName { get; set; } = string.Empty;
 
-        [Required, DisplayName("Пароль")]
-        public string Password { get; set; }
+        [Required(ErrorMessage = "Пароль обязателен")]
+        [PasswordComplexity]
+        [DisplayName("Пароль")]
+        public string Password { get; set; } = string.Empty;
 
-        [Required, DisplayName("Запомнить меня")]
+        [Required(ErrorMessage = "Запомнить меня")]
+        [DisplayName("Запомнить меня")]
         public bool RememberMe { get; set; }
     }
 }

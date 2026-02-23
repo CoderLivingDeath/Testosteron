@@ -1,0 +1,23 @@
+@model RegisterModel
+
+<form asp-area="" asp-controller="Account" asp-action="Register" method="post" asp-route-returnUrl=@ViewBag.returnUrl>
+    <h1>Регистрация</h1>
+    <div>
+        <label asp-for="UserName"></label>
+        <input type="text" asp-for="UserName" class="form-control" />
+        <span asp-validation-for="UserName" class="text-danger"></span>
+    </div>
+    <div>
+        <label asp-for="Password"></label>
+        <input type="password" asp-for="Password" class="form-control" />
+        <span asp-validation-for="Password" class="text-danger"></span>
+    </div>
+    <div>
+        <label asp-for="ConfirmPassword"></label>
+        <input asp-for="ConfirmPassword" class="form-control" />
+        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+    </div>
+    <div>
+        <input type="submit" value="Регистрация" />
+    </div>
+</form>

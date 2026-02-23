@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Testosteron.Data;
 using Testosteron.Domain;
@@ -42,9 +42,9 @@ namespace Testosteron
 
                 // Минимальные требования к паролю
                 options.Password.RequireDigit = false;
-                options.Password.RequireLowercase = false;
+                options.Password.RequireLowercase = true;
                 options.Password.RequireNonAlphanumeric = false;
-                options.Password.RequireUppercase = false;
+                options.Password.RequireUppercase = true;
                 options.Password.RequiredLength = 3;
                 options.Password.RequiredUniqueChars = 1;
 

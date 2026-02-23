@@ -1,9 +1,10 @@
 @using Testosteron.Views.Components
 @model TestFieldComponentViewModel
 
-<div class="card mb-3">
+<div class="card mb-3 field-card" data-required="@Model.Field.Required.ToString().ToLower()">
     <div class="card-body">
         <input type="hidden" asp-for="Field.TestFieldType" />
+        <input type="hidden" asp-for="Field.Required" />
         
         <h3 class="card-title mb-3">@Model.Field.Title</h3>
         
@@ -11,6 +12,8 @@
         {
             <p class="text-muted mb-3">@Model.Field.Description</p>
         }
+        
+        <div class="field-validation-error text-danger mb-2" style="display: none;"></div>
         
         @switch (Model.Field.TestFieldType)
         {
@@ -20,7 +23,7 @@
                     <div class="form-check mb-2">
                         <input type="checkbox" 
                                asp-for="@Model.CheckboxValues[j]"
-                               class="form-check-input" />
+                               class="form-check-input field-input" />
                         <label class="form-check-label">
                             @Model.Field.Options[j]
                         </label>
@@ -35,7 +38,7 @@
                         <input type="radio" 
                                asp-for="@Model.RadioIndex"
                                value="@j" 
-                               class="form-check-input" />
+                               class="form-check-input field-input" />
                         <label class="form-check-label">
                             @Model.Field.Options[j]
                         </label>
@@ -49,7 +52,7 @@
                     <div class="mb-3">
                         <label class="form-label">@Model.Field.Options[j]</label>
                         <textarea asp-for="@Model.TextValues[j]"
-                                  class="form-control" 
+                                  class="form-control field-input" 
                                   rows="3"></textarea>
                     </div>
                 }

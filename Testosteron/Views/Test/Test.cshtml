@@ -39,8 +39,75 @@
                 </div>`;
             document.getElementById('alertPlaceholder').innerHTML = alertHtml;
         }
+
+        function clearFieldErrors() {
+            document.querySelectorAll('.field-card').forEach(card => {
+                const errorDiv = card.querySelector('.field-validation-error');
+                if (errorDiv) {
+                    errorDiv.style.display = 'none';
+                    errorDiv.textContent = '';
+                }
+                card.classList.remove('border-danger');
+            });
+        }
+
+        function validateField(card) {
+            const isRequired = card.dataset.required === 'true';
+            const fieldType = card.querySelector('input[name*="TestFieldType"]')?.value;
+            const errorDiv = card.querySelector('.field-validation-error');
+            
+            if (!isRequired) {
+                return true;
+            }
+
+            let isValid = false;
+            const inputs = card.querySelectorAll('.field-input');
+
+            if (fieldType === 'check') {
+                isValid = Array.from(inputs).some(input => input.checked);
+            } else if (fieldType === 'radio') {
+                isValid = Array.from(inputs).some(input => input.checked);
+            } else {
+                isValid = Array.from(inputs).some(input => input.value.trim() !== '');
+            }
+
+            if (!isValid && errorDiv) {
+                errorDiv.textContent = 'Пожалуйста, ответьте на этот вопрос';
+                errorDiv.style.display = 'block';
+                card.classList.add('border-danger');
+            }
+
+            return isValid;
+        }
+
+        function validateAllFields() {
+            let isValid = true;
+            document.querySelectorAll('.field-card').forEach(card => {
+                if (!validateField(card)) {
+                    isValid = false;
+                }
+            });
+            return isValid;
+        }
+
+        document.querySelectorAll('.field-input').forEach(input => {
+            input.addEventListener('change', function() {
+                const card = this.closest('.field-card');
+                if (card) {
+                    validateField(card);
+                }
+            });
+        });
+
         $("#form").submit(function(e) {
             e.preventDefault();
+            clearFieldErrors();
+            
+            if (!validateAllFields()) {
+                showAlert('danger', 'Пожалуйста, заполните все обязательные поля');
+                return;
+            }
+
             const formData = new FormData(this);
             fetch("test", {
                 method: 'POST',
