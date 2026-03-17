@@ -1,4 +1,7 @@
 @model LoginModel
+@{
+    ViewBag.returnUrl = ViewBag.returnUrl ?? "/";
+}
 
 <form asp-area="" asp-controller="Account" asp-action="Login" method="post" asp-route-returnUrl=@ViewBag.returnUrl>
     <h1>Вход в аккаунт</h1>
@@ -21,5 +24,3 @@
         <input type="submit" value="Войти" />
     </div>
 </form>
-
-<script src="~/js/login-validation.js"></script>

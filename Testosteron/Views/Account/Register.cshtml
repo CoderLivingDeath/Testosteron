@@ -1,4 +1,7 @@
 @model RegisterModel
+@{
+    ViewBag.returnUrl = ViewBag.returnUrl ?? "/";
+}
 
 <form asp-area="" asp-controller="Account" asp-action="Register" method="post" asp-route-returnUrl=@ViewBag.returnUrl>
     <h1>Регистрация</h1>
@@ -14,7 +17,7 @@
     </div>
     <div>
         <label asp-for="ConfirmPassword"></label>
-        <input asp-for="ConfirmPassword" class="form-control" />
+        <input type="password" asp-for="ConfirmPassword" class="form-control" />
         <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
     </div>
     <div>

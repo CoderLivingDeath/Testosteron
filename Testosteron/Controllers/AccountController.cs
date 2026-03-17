@@ -35,7 +35,7 @@ namespace Testosteron.Controllers
         {
             if (ModelState.IsValid)
             {
-                ApplicationUser? user = await _userManager.FindByNameAsync(model.UserName);
+                ApplicationUser? user = await _userManager.FindByEmailAsync(model.UserName);
                 if (user != null)
                 {
                     await _signInManager.SignOutAsync();
@@ -48,7 +48,12 @@ namespace Testosteron.Controllers
                     }
                 }
             }
-            return View(model);
+            var allErrors = ModelState
+                .SelectMany(x => x.Value.Errors)
+                .Select(x => x.ErrorMessage)
+                .ToList();
+
+            return Json(allErrors);
         }
 
         [Authorize]
@@ -68,7 +73,7 @@ namespace Testosteron.Controllers
 
         [AllowAnonymous]
         [HttpPost("Register")]
-        public async Task<IActionResult> Register(RegisterModel model, string returnUrl)
+        public async Task<IActionResult> Register(RegisterModel model, string? returnUrl)
         {
             if (ModelState.IsValid)
             {
@@ -93,7 +98,13 @@ namespace Testosteron.Controllers
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
             }
-            return View(model);
+
+            var allErrors = ModelState
+                .SelectMany(x => x.Value.Errors)
+                .Select(x => x.ErrorMessage)
+                .ToList();
+
+            return Json(allErrors);
         }
     }
 }

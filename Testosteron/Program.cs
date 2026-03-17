@@ -94,7 +94,7 @@ namespace Testosteron
                     {
                         // 1. Создаём пользователя
                         adminUser = new ApplicationUser { UserName = "admin", Email = "my@email.com", EmailConfirmed = true };
-                        var createResult = await userManager.CreateAsync(adminUser, "superpassword");
+                        var createResult = await userManager.CreateAsync(adminUser, "Superpassword");
 
                         if (!createResult.Succeeded)
                         {
